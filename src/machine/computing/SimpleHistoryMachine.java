@@ -62,7 +62,9 @@ public class SimpleHistoryMachine extends AbstractHistoryMachine {
     public void tick() {
         scheduleTickStage(Optional.empty());
         cpu.forEach(Unit::tick);
+        cpuQueue.forEach(Process::waitingTick);
         io.forEach(Unit::tick);
+        ioQueue.forEach(Process::waitingTick);
         makeHistoryPoint();
         ++currentTick;
     }

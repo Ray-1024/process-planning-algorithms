@@ -11,16 +11,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@AllArgsConstructor
-@Getter
 public class Process implements StagedExecution<Stage> {
+    @Getter
     private final int id;
+    @Getter
     private final List<Stage> stages;
+
+    private int waitingTicks;
+
+    public Process(int id, List<Stage> stages) {
+        this.id = id;
+        this.stages = stages;
+    }
 
     @Override
     public Optional<Stage> schedule(Optional<Stage> value) {
         value.ifPresent(stages::addLast);
         return Optional.empty();
+    }
+
+    public void waitingTick() {
+        ++waitingTicks;
+    }
+
+    public double getR() {
+        return (double) (waitingTicks + stages.getFirst().getTicks()) / ((double) stages.getFirst().getTicks());
     }
 
     @Override
@@ -33,7 +48,10 @@ public class Process implements StagedExecution<Stage> {
 
     @Override
     public void tick() {
-        if (!stages.isEmpty()) stages.getFirst().tick();
+        if (!stages.isEmpty()) {
+            waitingTicks = 0;
+            stages.getFirst().tick();
+        }
     }
 
     @Override
