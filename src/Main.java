@@ -41,7 +41,7 @@ public class Main {
     public static void main(String[] args) throws URISyntaxException, IOException {
         var tasks = getTasks();
 
-        Path.of("output/").toFile().mkdirs();
+        Path.of("report/").toFile().mkdirs();
         for (Map.Entry<String, AbstractHistoryMachine> entry : new HashMap<String, AbstractHistoryMachine>() {{
             put("output/fcfs.txt", new FcfsMachine(4, 2));
             put("output/rr_1.txt", new RoundRobinMachine(4, 2, 1));
