@@ -1,9 +1,6 @@
 import algorithm.fcfs.FcfsMachine;
-import machine.computing.AbstractMachine;
+import machine.computing.SimpleHistoryMachine;
 import machine.process.Process;
-
-import java.util.List;
-import java.util.stream.IntStream;
 
 public class Main {
 
@@ -18,12 +15,13 @@ public class Main {
 
 
     public static void main(String[] args) {
-        AbstractMachine machine = new FcfsMachine();
+        SimpleHistoryMachine machine = new FcfsMachine();
         for (int tick = 0; ; ++tick) {
-            if (tick < 11 && tick % 2 == 0) machine.addProcess(Process.parse(tick >> 1, tasks[tick >> 1]));
+            if (tick < 11 && tick % 2 == 0) machine.schedule(Process.parse(tick >> 1, tasks[tick >> 1]));
             if (machine.isDone()) break;
             machine.tick();
+            machine.clean();
         }
-        System.out.println(machine.getHistoryMachineState());
+        System.out.println(String.join("\n", machine.getHistory()));
     }
 }

@@ -3,10 +3,10 @@ package machine.process.stage;
 import lombok.Getter;
 
 @Getter
-public class IO extends AbstractStage {
+public class IoStage extends AbstractStage {
     private final int id;
 
-    public IO(int id, int ticks) {
+    public IoStage(int id, int ticks) {
         super(ticks);
         this.id = id;
     }

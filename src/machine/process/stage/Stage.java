@@ -1,9 +1,7 @@
 package machine.process.stage;
 
-public interface Stage {
-    void setTicks(int ticks);
+import machine.StagedExecution;
 
+public interface Stage extends StagedExecution<Void> {
     int getId();
-
-    int getTicks();
 }

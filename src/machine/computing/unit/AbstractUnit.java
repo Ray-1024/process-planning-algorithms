@@ -4,14 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import machine.process.Process;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Getter
 public abstract class AbstractUnit implements Unit {
     protected final int id;
-    protected final List<Process> history = new ArrayList<>();
 
-    protected abstract boolean validateProcess(Process process);
+    protected abstract boolean validateProcess(Optional<Process> process);
 }

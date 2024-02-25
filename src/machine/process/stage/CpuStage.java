@@ -1,8 +1,8 @@
 package machine.process.stage;
 
-public class CPU extends AbstractStage {
+public class CpuStage extends AbstractStage {
 
-    public CPU(int ticks) {
+    public CpuStage(int ticks) {
         super(ticks);
     }
 
