@@ -56,7 +56,7 @@ public class SimpleHistoryIo extends AbstractHistoryUnit {
     @Override
     public void makeHistoryPoint() {
         if (!queue.isEmpty()) {
-            history.addLast(String.valueOf(queue.getFirst().getId()));
+            history.addLast(String.valueOf(queue.getFirst().getId() + 1));
         } else {
             history.addLast("-");
         }

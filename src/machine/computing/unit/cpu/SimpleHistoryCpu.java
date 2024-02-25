@@ -7,7 +7,6 @@ import machine.process.stage.CpuStage;
 
 import java.util.Optional;
 
-@Getter
 public class SimpleHistoryCpu extends AbstractHistoryUnit {
 
     protected Optional<Process> process = Optional.empty();
@@ -51,7 +50,7 @@ public class SimpleHistoryCpu extends AbstractHistoryUnit {
 
     @Override
     public void makeHistoryPoint() {
-        process.ifPresentOrElse(process1 -> history.addLast(String.valueOf(process1.getId())), () -> history.addLast("-"));
+        process.ifPresentOrElse(process1 -> history.addLast(String.valueOf(process1.getId() + 1)), () -> history.addLast("-"));
     }
 
     @Override

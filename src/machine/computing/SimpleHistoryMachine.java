@@ -4,7 +4,9 @@ import machine.StagedExecution;
 import machine.computing.unit.HistoryUnit;
 import machine.computing.unit.Unit;
 import machine.process.Process;
+import machine.process.stage.CpuStage;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -15,19 +17,12 @@ public class SimpleHistoryMachine extends AbstractHistoryMachine {
 
     protected SimpleHistoryMachine(List<HistoryUnit> cpu, List<HistoryUnit> io) {
         super(cpu, io);
-        makeHeader();
     }
 
-    void makeHeader() {
-        StringBuilder builder = new StringBuilder().append("T | ");
-        cpu.forEach(unit -> builder.append("CPU").append(unit.getId()).append(" | "));
-        io.forEach(unit -> builder.append("IO").append(unit.getId()).append(" | "));
-        history.add(builder.append("\n").toString());
-    }
-
-    private void scheduleTickStage() {
+    protected void scheduleTickStage(Optional<Comparator<Process>> comparator) {
         BiConsumer<List<Process>, List<HistoryUnit>> schedule = (queue, units) -> {
             while (!queue.isEmpty()) {
+                comparator.ifPresent(queue::sort);
                 var process = Optional.of(queue.removeFirst());
                 for (Unit unit : units) {
                     process = unit.schedule(process);
@@ -51,14 +46,21 @@ public class SimpleHistoryMachine extends AbstractHistoryMachine {
 
     @Override
     public Optional<Process> clean() {
-        cpuQueue.addAll(io.stream().map(Unit::clean).filter(Optional::isPresent).map(Optional::get).filter(process1 -> !process1.isDone()).toList());
-        ioQueue.addAll(cpu.stream().map(Unit::clean).filter(Optional::isPresent).map(Optional::get).filter(process1 -> !process1.isDone()).toList());
+        Stream.concat(io.stream(), cpu.stream())
+                .map(Unit::clean)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(process -> !process.isDone())
+                .forEachOrdered(unit -> {
+                    if (unit.getStages().getFirst() instanceof CpuStage) cpuQueue.addLast(unit);
+                    else ioQueue.addLast(unit);
+                });
         return Optional.empty();
     }
 
     @Override
     public void tick() {
-        scheduleTickStage();
+        scheduleTickStage(Optional.empty());
         cpu.forEach(Unit::tick);
         io.forEach(Unit::tick);
         makeHistoryPoint();
@@ -74,10 +76,10 @@ public class SimpleHistoryMachine extends AbstractHistoryMachine {
 
     @Override
     public void makeHistoryPoint() {
-        StringBuilder builder = new StringBuilder().append(currentTick).append(" ");
+        StringBuilder builder = new StringBuilder().append(currentTick).append(" : ");
         Stream.of(cpu, io).forEach(units -> {
-            builder.append("| ");
             units.forEach(unit -> builder.append(unit.getHistory().getLast()).append(" "));
+            builder.append("| ");
         });
         history.addLast(builder.toString());
     }

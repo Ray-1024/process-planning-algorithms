@@ -13,5 +13,13 @@ public abstract class AbstractHistoryMachine extends AbstractMachine implements 
 
     public AbstractHistoryMachine(List<HistoryUnit> cpu, List<HistoryUnit> io) {
         super(cpu, io);
+        makeHeader();
+    }
+
+    private void makeHeader() {
+        StringBuilder builder = new StringBuilder().append("T | ");
+        cpu.forEach(unit -> builder.append("CPU").append(unit.getId()).append(" | "));
+        io.forEach(unit -> builder.append("IO").append(unit.getId()).append(" | "));
+        history.add(builder.toString());
     }
 }

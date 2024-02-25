@@ -1,27 +1,42 @@
 import algorithm.fcfs.FcfsMachine;
-import machine.computing.SimpleHistoryMachine;
+import algorithm.rr.RoundRobinMachine;
+import algorithm.spn.SpnMachine;
+import algorithm.srt.SrtMachine;
+import machine.computing.AbstractHistoryMachine;
 import machine.process.Process;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 public class Main {
-
-    private static final String[] tasks = new String[]{
-            "CPU(12);IO2(16);CPU(12);IO1(18);CPU(36);IO2(10);CPU(24);IO2(18);CPU(24);IO1(18)",
-            "CPU(8);IO2(20);CPU(6);IO1(18);CPU(4);IO2(10);CPU(6);IO2(16);CPU(10);IO2(18);CPU(6);IO2(16)",
-            "CPU(24);IO2(14);CPU(12);IO1(18);CPU(12);IO1(18);CPU(60);IO1(20);CPU(36);IO1(14);CPU(48);IO2(14)",
-            "CPU(10);IO2(16);CPU(10);IO1(18);CPU(8);IO1(12);CPU(10);IO2(10);CPU(4);IO2(16);CPU(10);IO1(12)",
-            "CPU(36);IO1(10);CPU(36);IO1(14);CPU(48);IO1(10);CPU(48);IO2(20);CPU(48);IO2(10);CPU(24);IO2(12)",
-            "CPU(6);IO1(16);CPU(6);IO2(18);CPU(2);IO2(16);CPU(2);IO2(18);CPU(4);IO2(10);CPU(4);IO1(20)"
-    };
-
-
-    public static void main(String[] args) {
-        SimpleHistoryMachine machine = new FcfsMachine();
-        for (int tick = 0; ; ++tick) {
-            if (tick < 11 && tick % 2 == 0) machine.schedule(Process.parse(tick >> 1, tasks[tick >> 1]));
+    private static void lab(Map<Integer, String> tasks, AbstractHistoryMachine machine, PrintStream printer) {
+        for (int tick = 0, pid = 0; ; ++tick) {
+            if (tasks.containsKey(tick)) machine.schedule(Process.parse(pid++, tasks.get(tick)));
             if (machine.isDone()) break;
             machine.tick();
             machine.clean();
         }
-        System.out.println(String.join("\n", machine.getHistory()));
+        printer.println(String.join("\n", machine.getHistory()));
+    }
+
+    private static Map<Integer, String> getTasks() throws URISyntaxException, IOException {
+        List<String> lines = Files.readAllLines(Path.of(Objects.requireNonNull(Main.class.getResource("tasks2.txt")).toURI()));
+        Map<Integer, String> tasks = new HashMap<>();
+        for (int i = 0; i < lines.size(); ++i) {
+            tasks.put(2 * i, lines.get(i));
+        }
+        return tasks;
+    }
+
+
+    public static void main(String[] args) throws URISyntaxException, IOException {
+        lab(getTasks(), new RoundRobinMachine(2, 2, 4), System.out);
     }
 }

@@ -1,10 +1,12 @@
 package machine.process.stage;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.Optional;
 
 @AllArgsConstructor
+@Getter
 public abstract class AbstractStage implements Stage {
     private int ticks;
 
